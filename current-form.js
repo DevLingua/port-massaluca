@@ -63,6 +63,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     btnPersons.textContent = `Persons (0)`;
+    dropDown.classList.add("hidden");
   }
 
   /**
@@ -133,22 +134,47 @@ document.addEventListener("DOMContentLoaded", () => {
     btn.addEventListener("click", (e) => {
       e.preventDefault();
       const clicked = e.target;
-      const btnSrc = clicked.dataset.src;
-      const counterVal = document.querySelector(`.counter-value--${btnSrc}`);
-
+      const btnSrc = clicked.dataset.src; // Get the data-src value (adult, children, babies)
+      const counterVal = document.querySelector(`.counter-value--${btnSrc}`); // Get the specific counter value
+  
+      // Parse the current counter value as an integer
+      let currentValue = parseInt(counterVal.textContent) || 0;
+  
+      // Increment or decrement based on the button type
       if (clicked.classList.contains("btn--increment")) {
-        counterVal.textContent++;
-        initialPersonsCount++;
-        handleIncrementAndDecrement(counterVal, clicked, initialPersonsCount++, "increment");
-      } else {
-        if (counterVal.textContent <= 0) return;
-        counterVal.textContent--;
-        initialPersonsCount--;
-        handleIncrementAndDecrement(counterVal, clicked, initialPersonsCount--, "decrement");
+        currentValue++; // Increment the counter
+        counterVal.textContent = currentValue;
+  
+        // Update specific counters
+        if (btnSrc === "adult") initialAdultCount = currentValue;
+        if (btnSrc === "children") initialChildrenCount = currentValue;
+        if (btnSrc === "babies") initialBabiesCount = currentValue;
+      } else if (clicked.classList.contains("btn--decrement")) {
+        if (currentValue > 0) {
+          currentValue--; // Decrement the counter
+          counterVal.textContent = currentValue;
+  
+          // Update specific counters
+          if (btnSrc === "adult") initialAdultCount = currentValue;
+          if (btnSrc === "children") initialChildrenCount = currentValue;
+          if (btnSrc === "babies") initialBabiesCount = currentValue;
+        }
       }
+  
+      // Dynamically update total persons count
+      initialPersonsCount = initialAdultCount + initialChildrenCount + initialBabiesCount;
+  
+      // Debugging logs to verify updates
+      console.log("Adult Count:", initialAdultCount);
+      console.log("Children Count:", initialChildrenCount);
+      console.log("Babies Count:", initialBabiesCount);
+      console.log("Total Persons:", initialPersonsCount);
+  
+      // Update the "Persons" button text
+      btnPersons.textContent = `Persons (${initialPersonsCount})`;
     });
   });
-
+  
   /**
    * Handles the search button click.
    * Validates inputs and opens a new URL with query parameters.
